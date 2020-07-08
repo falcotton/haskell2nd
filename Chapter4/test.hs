@@ -12,3 +12,15 @@ safetail' x | null x = []
 
 safetail'' [] = []
 safetail'' (_:xs) = xs
+
+True    || True     = True
+False   || True     = True
+True    || False    = True
+False   || False    = False
+
+(&&&) :: Bool -> Bool -> Bool
+a &&& b = if a /= True then  False else
+    if b /= True then False else True
+
+(&&&&) :: Bool -> Bool -> Bool
+a &&&& b = if a == True then b else False
