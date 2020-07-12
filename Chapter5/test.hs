@@ -4,7 +4,6 @@ sumsq' n = sum [x^2 | x<-[1..n ]]
 
 grid' x y = [(a,b)| a<-[0..x],b<-[0..y]]
 
-
 square' n = [(a,b) | (a,b) <- grid' n n, a/= b ]
 
 replicate' n a = [ a | _ <- [1..n] ] 
@@ -27,11 +26,8 @@ positions' x xs = find x (zip xs [0..])
 
 scalarproduct'  xs ys = sum [x*y |(x,y) <- zip xs ys]
 
-
-
-
 let2int :: Char -> Int
-let2int c  | isLower c = ord c - ord 'a'
+let2int c   | isLower c = ord c - ord 'a'
                 | isUpper c = ord c - ord 'A'
 
 int2low :: Int -> Char
@@ -41,6 +37,6 @@ int2up :: Int -> Char
 int2up n = chr (ord 'A' + n)
 
 shift' :: Int -> Char -> Char
-shift' n c  | isLower c = int2low a
+shift' n c   | isLower c = int2low a
                 | isUpper c = int2up a 
-                    where a = (let2int c +n) `mod` 26
+                        where a = (let2int c +n) `mod` 26
