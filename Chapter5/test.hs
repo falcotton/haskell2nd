@@ -28,7 +28,7 @@ scalarproduct'  xs ys = sum [x*y |(x,y) <- zip xs ys]
 
 let2int :: Char -> Int
 let2int c   | isLower c = ord c - ord 'a'
-                | isUpper c = ord c - ord 'A'
+			| isUpper c = ord c - ord 'A'
 
 int2low :: Int -> Char
 int2low n = chr (ord 'a' + n)
@@ -37,6 +37,6 @@ int2up :: Int -> Char
 int2up n = chr (ord 'A' + n)
 
 shift' :: Int -> Char -> Char
-shift' n c   | isLower c = int2low a
-                | isUpper c = int2up a 
-                        where a = (let2int c +n) `mod` 26
+shift' n c	| isLower c = int2low a
+			| isUpper c = int2up a 
+				where a = (let2int c +n) `mod` 26

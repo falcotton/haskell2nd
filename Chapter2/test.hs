@@ -7,9 +7,9 @@ factorial n = product [1..n]
 average ns = sum ns `div` length ns
 
 n = a `div` length xs
-        where
-                a = 10
-                xs = [1..5]
+    where
+        a = 10
+        xs = [1..5]
 
 last' n = head (reverse n)
 
