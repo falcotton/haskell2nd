@@ -21,4 +21,3 @@ palindrome' xs = reverse xs == xs
 twice' f x = f (f x)
  -- twice :: a -> b -> c
  -- twice :: (t -> t) -> t -> t
-

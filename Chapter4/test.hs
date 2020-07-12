@@ -1,7 +1,6 @@
 helve x = (take n x,drop n x )
     where n = length x `div` 2
 
-
 third x = head (tail (tail x))
 third' x = x !! 2
 third'' (_:_:x:_) = x
