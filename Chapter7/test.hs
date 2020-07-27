@@ -124,6 +124,6 @@ luhncheck :: [Int] -> Int
 luhncheck = sum . map (litle) . altmap (*1) (*2) 
 
 luhn :: [Int] -> Bool
-luhn x      | a `mod` 10 == 0   = True
-            | otherwise         = False
-                where a =  luhncheck x
+luhn x  | a `mod` 10 == 0   = True
+        | otherwise         = False
+            where a =  luhncheck x
