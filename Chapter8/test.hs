@@ -218,14 +218,66 @@ balance a   = Node' (balance xs) (balance ys)
         (xs,ys) = split a
 
 --5
-folde :: (Int -> a) -> (Expr -> Expr -> a) -> Expr -> a
-folde f g (Val n) = f n
-folde f g (Add x y) = g x y
+folde ::(Int -> a) -> (a -> a -> a) -> Expr -> a
+folde f g (Val n)   = f n
+folde f g (Add x y) = g (folde f g x) (folde f g y)
 
 --6
---plus :: Expr -> Expr -> Expr
---plus (Val x) (Val y) = (Val x+y)
---plus (Add ax bx) (Add ay by) = 
+eval'' :: Expr -> Int
+eval'' = folde (id) (\x y -> x + y) 
 
---eval'' :: Expr -> Int
---eval'' a = folde (id) () a
+eval''test = (Add (Add (Val 2) (Val 5)) (Val 4))
+
+size :: Expr -> Int
+size = folde (\x -> 1) (\x y -> x + y) 
+
+--7
+-- instance Eq a => Eq (Maybe a) where
+--     Just x  == Just y   = x == y
+--     Nothing == Nothing  = True
+--     _       == _        = False
+
+-- instance Eq a => Eq [a] where
+--     []      == []       = True
+--     (x:xs)  == (y:ys)   = x == y && [xs] == [ys]
+--     _       == _        = False 
+
+--8
+data Prop8  = Or Prop8 Prop8
+            | Eq Prop8 Prop8
+
+eval8 :: Subst -> Prop8 -> Bool
+eval8 s (Or p q)    = eval8 s p || eval8 s q
+eval8 s (Eq p q)    = eval8 s p == eval8 s q  
+
+vars8 :: Prop8 -> [Char]
+vars8 (Or p q)      = vars8 p ++ vars8 q
+vars8 (Eq p q)      = vars8 p ++ vars8 q
+
+--9
+-- test9's anser = 23
+test9 = Add9 (Val9 3) (Mult9 (Val9 4) (Val9 5))
+
+data Expr9 = Val9 Int | Add9 Expr9 Expr9 | Mult9 Expr9 Expr9
+
+-- value9 :: Expr9 -> Int
+-- value9 (Val9 n)     = n
+-- value9 (Add9 x y)   = value9 x + value9 y
+-- value9 (Mult9 x y)  = value9 x * value9 y
+
+type Cont9 = [Op9]
+data Op9 = EVAL9 Expr9 | ADD9 Int | MULT9 Int
+
+eval9 :: Expr9 -> Cont9 -> Int
+eval9 (Val9 n) c =  exec9 c n
+eval9 (Add9 x y) c =  eval9 x (EVAL9 y : c)
+eval9 (Mult9 x y)  c = eval9 x (EVAL9 y : c)
+
+exec9 :: Cont9 -> Int -> Int
+exec9 [] n = n
+exec9 (EVAL9 y : c) n = eval9 y (ADD9 n : c)
+exec9 (ADD9 n : c) m = exec9 c (n+m)
+exec9 (MULT9 n : c) m = exec9 c (n*m)
+
+value9 :: Expr9 -> Int
+value9 e = eval9 e []
