@@ -251,8 +251,8 @@ eval8 s (Or p q)    = eval8 s p || eval8 s q
 eval8 s (Eq p q)    = eval8 s p == eval8 s q  
 
 vars8 :: Prop8 -> [Char]
-vars8 (Or p q)      = vars8 p ++ vars8 q
-vars8 (Eq p q)      = vars8 p ++ vars8 q
+vars8 (Or p q)  = vars8 p ++ vars8 q
+vars8 (Eq p q)  = vars8 p ++ vars8 q
 
 --9
 -- test9's anser = 23
@@ -269,14 +269,14 @@ type Cont9 = [Op9]
 data Op9 = EVAL9 Expr9 | ADD9 Int | MULT9 Int
 
 eval9 :: Expr9 -> Cont9 -> Int
-eval9 (Val9 n) c =  exec9 c n
-eval9 (Add9 x y) c =  eval9 x (EVAL9 y : c)
-eval9 (Mult9 x y)  c = eval9 x (EVAL9 y : c)
+eval9 (Val9 n)      c   =  exec9 c n
+eval9 (Add9 x y)    c   =  eval9 x (EVAL9 y : c)
+eval9 (Mult9 x y)   c   = eval9 x (EVAL9 y : c)
 
 exec9 :: Cont9 -> Int -> Int
 exec9 [] n = n
 exec9 (EVAL9 y : c) n = eval9 y (ADD9 n : c)
-exec9 (ADD9 n : c) m = exec9 c (n+m)
+exec9 (ADD9 n : c)  m = exec9 c (n+m)
 exec9 (MULT9 n : c) m = exec9 c (n*m)
 
 value9 :: Expr9 -> Int
