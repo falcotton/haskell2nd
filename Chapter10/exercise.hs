@@ -83,15 +83,15 @@ getCh = do  hSetEcho stdin False
 
 read' :: IO String
 read' = do  x <- getCh
-            if x == '\n' then
-              return []
-            else
-              do 
-                  case x of
-                    '\DEL' -> putStr "\b \b"
-                    otherwise -> putChar x
-                  xs <- read'
-                  return (x:xs)
+          if x == '\n' then
+            return []
+          else
+            do 
+                case x of
+                  '\DEL' -> putStr "\b \b"
+                  otherwise -> putChar x
+                xs <- read'
+                return (x:xs)
 
 remdel :: String -> String ->  String
 remdel xs []      = xs
