@@ -1,120 +1,105 @@
-import System.IO
+import Prelude hiding (putStr)
 import Data.Char
+import System.IO hiding (putStr)
+--1
+putStr :: String -> IO ()
+putStr xs = sequence_ [putChar x | x <- xs ]
 
-act :: IO (Char,Char)
-act = do  x <- getChar
-          getChar
-          y <- getChar
-          return (x,y)
-
-strlen :: IO ()
-strlen = do putStr "Enter a string: "
-            xs <- getLine
-            putStr "The string has "
-            putStr (show (length xs))
-            putStrLn " characters"
-
--- Hangman
-hangman :: IO ()
-hangman = do  putStrLn "Think of a word: "
-              word <- sgetLine
-              putStrLn "Try to guess is : "
-              play word
-
-sgetLine :: IO String
-sgetLine = do x <- getCh
-              if x == '\n' then
-                do  putChar x
-                    return []
-              else
-                do  putChar '-'
-                    xs <- sgetLine
-                    return (x:xs)
-getCh :: IO Char
-getCh = do  hSetEcho stdin False
-            x <- getChar
-            hSetEcho stdin True
-            return x
-
-play :: String -> IO ()
-play word = do  putStr "? "
-                guess <- getLine
-                if guess == word then
-                  putStrLn "You got it!!"
-                else
-                  do  putStrLn (match word guess)
-                      play word
-              
-match :: String -> String -> String
-match xs ys = [if elem x ys then x else '-' | x <- xs]
-
-
--- Nim
-next :: Int -> Int
-next 1 = 2
-next 2 = 1
-
+--2
+-- no edit
 type Board = [Int]
-
-initial :: Board
-initial = [5,4,3,2,1]
-
-finished :: Board -> Bool
-finished = all (== 0)
-
-valid :: Board -> Int -> Int -> Bool
-valid board row num = board !! (row -1) >= num
-
-move :: Board -> Int -> Int -> Board
-move board row num = [update r n | (r,n) <- zip [1..] board]
-  where update r n = if r == row then n - num else n
-
 putRow :: Int -> Int -> IO ()
 putRow row num = do putStr (show row)
                     putStr ": "
                     putStrLn (concat (replicate num "* "))
 
+
 putBoard :: Board -> IO ()
-putBoard [a,b,c,d,e] = do putRow 1 a
-                          putRow 2 b
-                          putRow 3 c
-                          putRow 4 d
-                          putRow 5 e
+putBoard b = putB b (length b)
 
-getDigit :: String -> IO Int
-getDigit prompt = do  putStr prompt
-                      x <- getChar
-                      newline
-                      if isDigit x then
-                        return (digitToInt x)
-                      else
-                        do  putStrLn "Error: Invalid digit"
-                            getDigit prompt
+putB :: Board -> Int -> IO ()
+putB _ 0 = return ()
+putB (x:xs) n = do  putRow x n
+                    putB xs (n-1)
 
+--3
+putBoard' :: Board -> IO ()
+putBoard' b = sequence_ [putRow x y | (x,y) <- zip [1..] b]
+
+--4
 newline :: IO ()
 newline = putChar '\n'
 
-playnim :: Board -> Int -> IO ()
-playnim board player =
-  do  newline
-      putBoard board
-      if finished board then
-        do  newline
-            putStr "Player"
-            putStr (show (next player))
-            putStrLn " wins!"
-      else
-        do  newline
-            putStr "Player"
-            putStrLn (show player)
-            row <- getDigit "Enter a row number : "
-            num <- getDigit "Start to remove : "
-            if valid board row num then
-              playnim (move board row num) (next player)
-            else
-              do  newline
-                  putStrLn "ERROR: Invalid move"
-                  playnim board player
+adder :: IO ()
+adder = do  putStr "How many numbers? "
+            n <- getDigit
+            newline
+            ans <- add 0 n
+            putStrLn ("The total is " ++ show ans)
+            
+add :: Int -> Int -> IO Int
+add s 0 = return s
+add s i = do  putStr "Enter number: "
+              n <- getDigit
+              newline
+              add (s + n) (i - 1)
 
-nim :: IO ()
-nim = playnim initial 1
+getDigit :: IO Int
+getDigit = do x <- getChar
+              if isDigit x then
+                return (digitToInt x)
+              else
+                do  newline
+                    putStrLn "ERROR: Invalid digit"
+                    getDigit
+
+--5
+adder' :: IO ()
+adder' = do putStr "How many numbers? "
+            n <- getDigit
+            newline
+            xs <- sequence [add 0 n ]
+            putStrLn ("The total is " ++ show (head xs))
+
+--6
+getCh ::IO Char
+getCh = do  hSetEcho stdin False
+            x <- getChar
+            hSetEcho stdin True
+            return x
+
+-- readLine :: IO String
+-- readLine = do x <- getCh
+--               case x of
+--                 '\n' -> return []
+--                 '\DEL' -> do  putChar '\b'
+--                               putChar ' '
+--                               putChar '\b'
+--                               xs <- readLine
+--                               return (x:xs)
+--                 otherwise -> do putChar x
+--                                 xs <- readLine
+--                                 return (remdel [] (x:xs))
+
+read' :: IO String
+read' = do  x <- getCh
+            if x == '\n' then
+              return []
+            else
+              do 
+                  case x of
+                    '\DEL' -> putStr "\b \b"
+                    otherwise -> putChar x
+                  xs <- read'
+                  return (x:xs)
+
+remdel :: String -> String ->  String
+remdel xs []      = xs
+remdel [] (y:ys)  = if y == '\DEL' then remdel [] ys else remdel [y] ys
+remdel xs (y:ys)  | y == '\DEL' = remdel (init xs)    ys
+                  | otherwise   = remdel (xs ++ [y])  ys
+
+readLine :: IO String
+readLine = do xs <- read'
+              newline
+              return (remdel [] xs)
