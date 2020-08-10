@@ -68,19 +68,6 @@ getCh = do  hSetEcho stdin False
             hSetEcho stdin True
             return x
 
--- readLine :: IO String
--- readLine = do x <- getCh
---               case x of
---                 '\n' -> return []
---                 '\DEL' -> do  putChar '\b'
---                               putChar ' '
---                               putChar '\b'
---                               xs <- readLine
---                               return (x:xs)
---                 otherwise -> do putChar x
---                                 xs <- readLine
---                                 return (remdel [] (x:xs))
-
 read' :: IO String
 read' = do  x <- getCh
           if x == '\n' then
