@@ -1,6 +1,8 @@
 import Data.Char
 import Data.List
 import System.IO
+import System.Random hiding (next)
+-- using command : stack ghci --package random ./Chapter11/exercise.hs
 
 size :: Int
 size = 3
@@ -155,11 +157,11 @@ minimax (Node g ts)
         ts' = map minimax ts
         ps = [p | Node (_,p) _ <- ts']
 
-bestmove :: Grid -> Player -> Grid
-bestmove g p = head [g' | Node (g',p') _ <- ts, p' == best]
-                  where
-                    tree = prune depth (gametree g p)
-                    Node (_,best) ts = minimax tree
+-- bestmove :: Grid -> Player -> Grid
+-- bestmove g p = head [g' | Node (g',p') _ <- ts, p' == best]
+--                   where
+--                     tree = prune depth (gametree g p)
+--                     Node (_,best) ts = minimax tree
 
 main :: IO ()
 main = do hSetBuffering stdout NoBuffering
@@ -170,6 +172,37 @@ play g p = do cls
               goto (1,1)
               putGrid g
               play' g p
+
+-- play' :: Grid -> Player -> IO ()
+-- play' g p  
+--   | wins O g  = putStrLn "Player 0 wins\n"
+--   | wins X g  = putStrLn "Player X wins\n"
+--   | full g    = putStrLn "It's a draw!\n"
+--   | p == O    = do  i <- getNat (prompt p)
+--                     case move g i p of
+--                       []    -> do putStrLn "ERROR: Invalid move"
+--                                   play' g p
+--                       [g']  -> play g' (next p)
+--   | p == X    = do  putStr "Player X is thinking... "
+--                     (play $! (bestmove g p)) (next p)
+  
+  
+  
+--1
+treesize :: Tree a -> Int
+treesize (Node _ []) = 1
+treesize (Node _ ts) = 1 + sum (map treesize ts) 
+
+treedepth :: Tree a -> Int
+treedepth (Node _ []) = 0
+treedepth (Node _ ts) = 1 + maximum (map treedepth ts)
+
+--2
+bestmove :: Grid -> Player -> [Grid]
+bestmove g p = [g' | Node (g',p') _ <- ts, p' == best]
+                  where
+                    tree = prune depth (gametree g p)
+                    Node (_,best) ts = minimax tree
 
 play' :: Grid -> Player -> IO ()
 play' g p  
@@ -182,15 +215,8 @@ play' g p
                                   play' g p
                       [g']  -> play g' (next p)
   | p == X    = do  putStr "Player X is thinking... "
-                    (play $! (bestmove g p)) (next p)
-  
-  
-  
---1
-treesize :: Tree a -> Int
-treesize (Node _ []) = 1
-treesize (Node _ ts) = 1 + sum (map treesize ts) 
+                    let gs = bestmove g p
+                    rand <- randomRIO (0, length gs -1 )
+                    (play $! (gs !! rand)) (next p)
 
-treedepth :: Tree a -> Int
-treedepth (Node _ []) = 0
-treedepth (Node _ ts) = 1 + maximum (map treedepth ts)
+--3
