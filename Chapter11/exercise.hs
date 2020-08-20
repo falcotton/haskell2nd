@@ -145,17 +145,17 @@ prune n (Node x ts) = Node x [prune (n-1) t | t <- ts]
 depth :: Int
 depth = 9
 
-minimax :: Tree Grid -> Tree (Grid,Player)
-minimax (Node g [])
-  | wins O g = Node (g,O) []
-  | wins X g = Node (g,X) []
-  | otherwise = Node (g,B) []
-minimax (Node g ts)
-  | turn g == O = Node (g,minimum ps) ts'
-  | turn g == X = Node (g,maximum ps) ts'
-      where
-        ts' = map minimax ts
-        ps = [p | Node (_,p) _ <- ts']
+-- minimax :: Tree Grid -> Tree (Grid,Player)
+-- minimax (Node g [])
+--   | wins O g = Node (g,O) []
+--   | wins X g = Node (g,X) []
+--   | otherwise = Node (g,B) []
+-- minimax (Node g ts)
+--   | turn g == O = Node (g,minimum ps) ts'
+--   | turn g == X = Node (g,maximum ps) ts'
+--       where
+--         ts' = map minimax ts
+--         ps = [p | Node (_,p) _ <- ts']
 
 -- bestmove :: Grid -> Player -> Grid
 -- bestmove g p = head [g' | Node (g',p') _ <- ts, p' == best]
@@ -186,7 +186,8 @@ play g p = do cls
 --   | p == X    = do  putStr "Player X is thinking... "
 --                     (play $! (bestmove g p)) (next p)
   
-  
+samplegrid = [[O,B,B],[X,X,O],[X,O,B]]
+sampletree = gametree samplegrid O
   
 --1
 treesize :: Tree a -> Int
@@ -220,3 +221,21 @@ play' g p
                     (play $! (gs !! rand)) (next p)
 
 --3
+minimax :: Tree Grid -> Tree (Grid,Player)
+minimax (Node g [])
+  | wins O g = Node (g,O) []
+  | wins X g = Node (g,X) []
+  | otherwise = Node (g,B) []
+minimax (Node g ts)
+  | turn g == O = Node (g,minimum ps) ts'
+  | turn g == X = Node (g,maximum ps) ts'
+      where
+        ts' = map minimax ts
+        mind = head (map mindepth ts)
+        ps = [p | Node (_,p) _ <- ts']
+
+mindepth :: Tree a -> Tree a
+mindepth (Node x ts)  = if length mints == 0 then Node x ts else head mints
+                        where
+                          mints = [tss | tss <- ts, treedepth tss == min]
+                          min   = minimum (map treedepth ts)
