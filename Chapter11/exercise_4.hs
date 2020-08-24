@@ -337,11 +337,11 @@ minimax p (Node g [])
   | otherwise = Node (g,B) []
 minimax p (Node g ts) = Node (g, pp) [Node (gg, pp) tss]
                         where
-                          Node (gg, pp) tss = alfabeta p ts
+                          Node (gg, pp) tss = alphabeta p ts
 
-alfabeta :: Player -> [Tree Grid] -> Tree (Grid,Player)
-alfabeta p (t:[]) = minimax (next p) t
-alfabeta p (t:ts) = if pm == p then Node (gm, pm) tm else alfabeta p ts
+alphabeta :: Player -> [Tree Grid] -> Tree (Grid,Player)
+alphabeta p (t:[]) = minimax (next p) t
+alphabeta p (t:ts) = if pm == p then Node (gm, pm) tm else alphabeta p ts
                       where
                         Node (gm, pm) tm = minimax (next p) t
 
@@ -350,6 +350,3 @@ bestmove t g p = head [g' | Node (g',p') _ <- ts, p' == best]
                   where
                     cts = curNode g t
                     Node (_,best) ts = head (map (minimax p) cts)
-
-testgrid = [[O,O,B],[X,X,O],[X,O,B]]
-testtree = gametree testgrid X
