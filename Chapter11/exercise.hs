@@ -236,6 +236,7 @@ minimax (Node g ts)
 
 mindepth :: Tree a -> Tree a
 mindepth (Node x ts)  = if length mints == 0 then Node x ts else head mints
-                        where
-                          mints = [tss | tss <- ts, treedepth tss == min]
-                          min   = minimum (map treedepth ts)
+                          where
+                            mints = [tss | tss <- ts, treedepth tss == min]
+                            min   = minimum (map treedepth ts)
+
