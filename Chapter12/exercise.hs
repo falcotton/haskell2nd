@@ -60,12 +60,54 @@ instance Applicative ZipList where
 data Expr a = Var a | Val Int | Add (Expr a) (Expr a)
   deriving Show
 
-x = Add (Var [1,2,3]) (Add (Var [2,4,6]) (Val 4))
-
+x = Add (Var [1,2,3]) (Add (Var [2,4,6]) (Var [4,5]))
+y = (Val 4)
+z = (Var [3])
 instance Functor Expr where
   --fmap :: (a -> b) -> Expr a -> Expr b
-  fmap f (Var a) = Var (f a)
-  fmap f (Val n) = Val n
-  fmap f (Add l r) = Add (fmap f l) (fmap f r)
+  fmap f (Var a)    = Var (f a)
+  fmap f (Val n)    = Val n
+  fmap f (Add l r)  = Add (fmap f l) (fmap f r)
 
---stack ghci ./Chapter12/exercise.hs
+instance Applicative Expr where
+  --pure :: a -> f a
+  pure a = Var a
+  -- <*> :: Expr (a -> b) -> Expr a -> Expr b
+  (Var g) <*> a = fmap g a
+
+instance Monad Expr where
+  -- (>>=) :: Expr a -> (a -> Expr b) -> Expr b
+  (Var a)   >>= f = f a
+  (Val a)   >>= f = (Val a)
+  (Add l r) >>= f = Add (l >>= f) (r >>= f)
+
+
+-- 8
+type State = Int
+newtype ST a = S (State -> (a,State))
+
+app ::ST a -> State -> (a,State)
+app (S st) x = st x
+
+instance Monad ST where
+  -- (>>=) :: ST a -> (a -> ST b) -> ST b
+  st >>= f = S (\s -> 
+    let (x,s') = app st s in app (f x) s')
+
+instance Applicative ST where
+  -- pure :: a -> ST a
+  pure x = S(\s -> (x,s))
+  -- <*> :: ST (a -> b) -> ST a -> ST b
+  -- stf <*> stx = S(\s ->
+  --   let (f,s')  = app stf s'
+  --       (x,s'') = app stx s' in (f x,s''))
+  stf <*> stx = do  s <- stx
+                    f <- stf
+                    return . f $ s
+                    
+
+instance Functor ST where
+  -- fmap :: (a -> b) -> ST a -> ST b
+  -- fmap g st = S(\s -> let (x,s') = app st s in (g x,s'))
+  fmap g st = do  s <- st
+                  return . g $ s
